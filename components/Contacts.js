@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import {PermissionsAndroid} from 'react-native';
 import Contacts from 'react-native-contacts';
+import { NavigationEvents } from 'react-navigation';
 
 class Contact extends React.Component {
 
@@ -82,8 +83,8 @@ class ContactList extends React.Component {
       throw new Error('Contacts permission not granted');
     }
 
-    let contacts = []
     Contacts.getAll((err, data) => {
+      let contacts = []
       if (err === 'denied'){
         throw new Error('Contacts can not be read');
       } else {
@@ -100,14 +101,17 @@ class ContactList extends React.Component {
           })
         })
       }
+
+      this.state.contacts = contacts;
+      console.log("setting state")
+      this.setState(this.state)
     })
-    this.state.contacts = contacts;
-    this.setState(this.state.contacts)
   }
 
   render() {
     return (
       <View style={styles.container}>
+      <NavigationEvents onDidFocus={() => console.log('I am triggered')} />
       <Text style={styles.header}>{`${this.state.contacts.length} Contacts`}</Text>
       <FlatList
         data={this.state.contacts}
