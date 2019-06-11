@@ -9,8 +9,8 @@ import {
   View,
   FlatList
 } from 'react-native';
-import {Contacts as ExpoContacts} from 'expo';
-import {Permissions} from 'expo';
+import {PermissionsAndroid} from 'react-native';
+import Contacts from 'react-native-contacts';
 
 class Contact extends React.Component {
 
@@ -48,40 +48,58 @@ class ContactList extends React.Component {
     />
   )}
 
-  componentDidMount(){
+	async requestContactsPermission() {
+		try {
+			const granted = await PermissionsAndroid.request(
+				PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+				{
+					title: 'Tim needs to see contacts',
+					message:
+						'Tim needs to read contacts' +
+						'so that you can send them clock',
+					buttonNeutral: 'Ask Me Later',
+					buttonNegative: 'Cancel',
+					buttonPositive: 'OK',
+				},
+			);
+			if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+				console.log('You can read contacts');
+				return true
+			} else {
+				console.log('Contacts permission denied');
+			}
+		} catch (err) {
+			console.warn(err);
+		}
+		return false
+	}
+
+  async componentDidMount(){
     // load contacts once component loads, and set props
     // correctly
-    //const { status, permissions } = await Permissions.askAsync(Permissions.CONTACTS);
-    /*if (status != 'granted') {
+    const success = await this.requestContactsPermission()
+    if (!success) {
       throw new Error('Contacts permission not granted');
     }
-    const { data } = await ExpoContacts.getContactsAsync({
-        fields: [ExpoContacts.Fields.PhoneNumbers],
-    });*/
-    let data = [];
 
     let contacts = []
-        contacts.push({
-          id: 'uuid',
-          name: 'dummy',
-          phone: '0',
-          label: 'dumdum',
+    Contacts.getAll((err, data) => {
+      if (err === 'denied'){
+        throw new Error('Contacts can not be read');
+      } else {
+        // contacts returned in Array
+        data.forEach((contact)=>{
+          console.log(contact)
+          contact.phoneNumbers.forEach((phone)=>{
+            contacts.push({
+              id: `${contact.id}-${phone.id}`,
+              name: contact.givenName+' '+contact.familyName,
+              phone: phone.number,
+              label: phone.label,
+            })
+          })
         })
-    data.forEach((contact)=>{
-        contacts.push({
-          id: `${contact.id}`,
-          name: contact.name,
-          phone: '0',
-          label: 'contact',
-        })
-      contact.phoneNumbers.forEach((phone)=>{
-        contacts.push({
-          id: `${contact.id}-${phone.id}`,
-          name: contact.name,
-          phone: phone.number,
-          label: phone.label,
-        })
-      })
+      }
     })
     this.state.contacts = contacts;
     this.setState(this.state.contacts)
