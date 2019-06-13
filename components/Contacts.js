@@ -12,24 +12,19 @@ import {
 import {PermissionsAndroid} from 'react-native';
 import Contacts from 'react-native-contacts';
 import { NavigationEvents } from 'react-navigation';
+import {Header, Avatar, List, ListItem } from 'react-native-elements'
 
 class Contact extends React.Component {
 
   render() {
     return (
-      <View style={styles.contact}>
-        <Text style={{color: '#09f'}}>
-          {this.props.name}
-        </Text>
-        <Text >
-        <Text style={{fontWeight: 'bold'}}>
-          {this.props.label} {' '}
-        </Text>
-        <Text>
-          {this.props.phone}
-        </Text>
-        </Text>
-      </View>
+      <ListItem
+        style={styles.contact}
+        key={this.props.phone}
+        title={this.props.name}
+        subtitle={this.props.phone}
+        leftAvatar={<Avatar rounded title="MD" />}
+      />
     )
   }
 }
@@ -111,9 +106,12 @@ class ContactList extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-      <NavigationEvents onDidFocus={() => console.log('I am triggered')} />
-      <Text style={styles.header}>{`${this.state.contacts.length} Contacts`}</Text>
-      <FlatList
+      <Header
+        leftComponent={{ icon: 'menu', color: '#fff' }}
+        centerComponent={{ text: 'Contacts', style: { color: '#fff' } }}
+        rightComponent={{ icon: 'home', color: '#fff' }}
+      />
+      <FlatList style={styles.container}
         data={this.state.contacts}
         extraData={this.state}
         keyExtractor={this._keyExtractor}
@@ -127,14 +125,10 @@ class ContactList extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0ff',
-    alignItems: 'flex-start',
     alignSelf: 'stretch',
-    justifyContent: 'center',
   },
   header: {
     flex: 0,
-    backgroundColor: '#05f',
     color: '#fff',
     alignSelf: 'stretch',
     alignItems: 'flex-start',
@@ -142,7 +136,7 @@ const styles = StyleSheet.create({
   },
   contact: {
     borderBottomWidth: StyleSheet.hairlineWidth,
-    alignSelf: 'stretch',
+    //alignSelf: 'stretch',
     flex: 1
   }
 });

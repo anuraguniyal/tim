@@ -24,7 +24,6 @@ export default class ContactsScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ff0',
     alignItems: 'flex-start',
     justifyContent: 'center',
     padding: 8,
